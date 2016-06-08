@@ -59,7 +59,7 @@ def prep_query(json_data, repo, table, tstamp):
 def make_query(query):
     dh = DataHub(client_id=client_id, client_secret=client_secret,
                  grant_type='password', username=username, password=password)
-    res = dh.query(repo_base='al_carter', repo='test_repo', query=query)
+    res = dh.query(repo_base='al_carter', repo='wifi', query=query)
 
     return res
 
