@@ -1,3 +1,5 @@
+import sched
+import time
 import os
 import requests
 import json
@@ -15,10 +17,22 @@ def scrape_data():
                          auth=(ISTUSER, ISTPASS))
         json_data = json.loads(r.content)
     except Exception as e:
-        print e
-        # log the exception into logs.txt
-        pass
+        write_to_log_file(str(e) + "\n-----")
     return (json_data, tstamp)
+
+
+def write_to_log_file(string):
+    # create a directory for the errors, if necessary
+    current_directory = os.getcwd()
+    if not os.path.exists(current_directory + '/logs'):
+        os.makedirs(current_directory + '/logs')
+    filename = current_directory + '/data/logs.txt'
+
+    # write error to the data file
+    with file(filename, 'w') as current_file:
+        current_file.write(str(string))
+
+    return filename
 
 
 def write_data_to_file(json_data, tstamp):
@@ -28,7 +42,7 @@ def write_data_to_file(json_data, tstamp):
         os.makedirs(current_directory + '/data')
     filename = current_directory + '/data/' + str(tstamp)
 
-    # write write to the data file
+    # write data to the data file
     with file(filename, 'w') as current_file:
         current_file.write(str(json_data))
 
@@ -64,18 +78,27 @@ def make_query(query):
     return res
 
 
-# actually do the thing
-print('scraping data')
-(json_data, tstamp) = scrape_data()
+def scrape_and_insert_data():
+    # actually do the thing
+    print('scraping data')
+    (json_data, tstamp) = scrape_data()
 
-print('truncating data for debugging purposes')
-json_data = json_data[0:3]
+    print('truncating data for debugging purposes')
+    json_data = json_data[0:3]
 
-print('writing data to file')
-filename = write_data_to_file(json_data, tstamp)
+    print('writing data to file')
+    filename = write_data_to_file(json_data, tstamp)
 
-print('prepping query')
-query = prep_query(json_data, 'wifi', 'wifi', tstamp)
+    print('prepping query')
+    query = prep_query(json_data, 'wifi', 'wifi', tstamp)
 
-print('executing query')
-res = make_query(query)
+    print('executing query')
+    res = make_query(query)
+    write_to_log_file(str(res) + "\n----")
+
+    # wait for 5 minutes, and then scrape data again
+    time.sleep(5 * 60)
+    scrape_and_insert_data()
+
+
+scrape_and_insert_data()
