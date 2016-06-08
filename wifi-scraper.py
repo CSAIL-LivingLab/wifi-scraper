@@ -7,8 +7,8 @@ from datahub import DataHub
 from secret import client_id, client_secret, username, password, ISTUSER, \
     ISTPASS
 
+
 def scrape_data():
-    # create a data directory to temporarily store the data
     tstamp = datetime.now()
     try:
         r = requests.get('https://nist-data.mit.edu/wireless/clients.cgi',
@@ -22,12 +22,16 @@ def scrape_data():
 
 
 def write_data_to_file(json_data, tstamp):
+    # create a directory for the data, if necessary
     current_directory = os.getcwd()
     if not os.path.exists(current_directory + '/data'):
         os.makedirs(current_directory + '/data')
     filename = current_directory + '/data/' + str(tstamp)
+
+    # write write to the data file
     with file(filename, 'w') as current_file:
         current_file.write(str(json_data))
+
     return filename
 
 
@@ -58,3 +62,20 @@ def make_query(query):
     res = dh.query(repo_base='al_carter', repo='test_repo', query=query)
 
     return res
+
+
+# actually do the thing
+print('scraping data')
+(json_data, tstamp) = scrape_data()
+
+print('truncating data for debugging purposes')
+json_data = json_data[0:3]
+
+print('writing data to file')
+filename = write_data_to_file(json_data, tstamp)
+
+print('prepping query')
+query = prep_query(json_data, 'wifi', 'wifi', tstamp)
+
+print('executing query')
+res = make_query(query)
