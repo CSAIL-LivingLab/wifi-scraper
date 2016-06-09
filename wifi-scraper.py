@@ -1,4 +1,3 @@
-import sched
 import time
 import os
 import requests
@@ -17,15 +16,15 @@ def scrape_data():
                          auth=(ISTUSER, ISTPASS))
         json_data = json.loads(r.content)
     except Exception as e:
-        write_to_log_file(str(e) + "\n-----")
+        write_to_log_file(str(e) + "\n-----\n")
     return (json_data, tstamp)
 
 
 def write_to_log_file(string):
     # create a directory for the errors, if necessary
     current_directory = os.getcwd()
-    if not os.path.exists(current_directory + '/logs'):
-        os.makedirs(current_directory + '/logs')
+    if not os.path.exists(current_directory + '/data'):
+        os.makedirs(current_directory + '/data')
     filename = current_directory + '/data/logs.txt'
 
     # write error to the data file
@@ -73,7 +72,7 @@ def prep_query(json_data, repo, table, tstamp):
 def make_query(query):
     dh = DataHub(client_id=client_id, client_secret=client_secret,
                  grant_type='password', username=username, password=password)
-    res = dh.query(repo_base='al_carter', repo='wifi', query=query)
+    res = dh.query(repo_base='livinglab', repo='wifi', query=query)
 
     return res
 
@@ -83,9 +82,6 @@ def scrape_and_insert_data():
     print('scraping data')
     (json_data, tstamp) = scrape_data()
 
-    print('truncating data for debugging purposes')
-    json_data = json_data[0:3]
-
     print('writing data to file')
     filename = write_data_to_file(json_data, tstamp)
 
@@ -94,7 +90,7 @@ def scrape_and_insert_data():
 
     print('executing query')
     res = make_query(query)
-    write_to_log_file(str(res) + "\n----")
+    write_to_log_file(str(res) + "\n----\n")
 
     # wait for 5 minutes, and then scrape data again
     time.sleep(5 * 60)
