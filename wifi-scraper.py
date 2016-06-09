@@ -83,13 +83,30 @@ def scrape_and_insert_data():
     (json_data, tstamp) = scrape_data()
 
     print('writing data to file')
-    filename = write_data_to_file(json_data, tstamp)
+    write_data_to_file(json_data, tstamp)
 
-    print('prepping query')
-    query = prep_query(json_data, 'wifi', 'wifi', tstamp)
+    # Split into queries of 500 rows to avoid timeout
 
-    print('executing query')
-    res = make_query(query)
+    inserted = 0
+    num_rows = 500
+    row_length = len(json_data)
+    while inserted < row_length:
+        data = None
+        if inserted + num_rows <= row_length:
+            data = json_data[inserted:inserted + num_rows]
+            print('prepping q for ' + inserted + 'to' + inserted + num_rows)
+            inserted += num_rows
+        else:
+            data = json_data[inserted:row_length]
+            print('prepping q for ' + inserted + 'to' + row_length)
+            inserted += row_length
+
+        query = prep_query(data, 'wifi', 'wifi', tstamp)
+
+        print('executing query')
+        res = make_query(query)
+
+    print('writing to log file')
     write_to_log_file(str(res) + "\n----\n")
 
     # wait for 5 minutes, and then scrape data again
