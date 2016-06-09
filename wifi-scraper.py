@@ -93,6 +93,7 @@ def scrape_and_insert_data():
     write_to_log_file(str(res) + "\n----\n")
 
     # wait for 5 minutes, and then scrape data again
+    print('waiting for 5 minutes, then scraping again')
     time.sleep(5 * 60)
     scrape_and_insert_data()
 
