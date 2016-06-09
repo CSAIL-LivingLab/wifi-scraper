@@ -94,11 +94,13 @@ def scrape_and_insert_data():
         data = None
         if inserted + num_rows <= row_length:
             data = json_data[inserted:inserted + num_rows]
-            print('prepping q for ' + inserted + 'to' + inserted + num_rows)
+            print('prepping query for %d to %d'
+                  % (inserted, inserted + num_rows))
             inserted += num_rows
         else:
             data = json_data[inserted:row_length]
-            print('prepping q for ' + inserted + 'to' + row_length)
+            print('prepping q for %d to %d'
+                  % (inserted, row_length))
             inserted += row_length
 
         query = prep_query(data, 'wifi', 'wifi', tstamp)
