@@ -44,6 +44,7 @@ def write_data_to_file(json_data, tstamp):
     # write data to the data file
     with file(filename, 'w') as current_file:
         current_file.write(str(json_data))
+        current_file.write(str(tstamp))
 
     return filename
 
