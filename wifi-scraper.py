@@ -11,12 +11,14 @@ from secret import client_id, client_secret, username, password, ISTUSER, \
 
 def scrape_data():
     tstamp = datetime.now()
+    json_data = []
     try:
         r = requests.get('https://nist-data.mit.edu/wireless/clients.cgi',
                          auth=(ISTUSER, ISTPASS))
         json_data = json.loads(r.content)
     except Exception as e:
-        write_to_log_file(str(e) + "\n-----\n")
+        write_to_log_file(
+            str(e) + "\n---request to nist-data.mit.edu failed--\n")
     return (json_data, tstamp)
 
 
@@ -110,7 +112,10 @@ def scrape_and_insert_data():
         res = make_query(query)
 
     print('writing to log file')
-    write_to_log_file(str(res) + "\n----\n")
+    try:
+        write_to_log_file(str(res) + "\n----\n")
+    except:
+        pass
 
     # wait for 5 minutes, and then scrape data again
     print('waiting for 5 minutes, then scraping again')
