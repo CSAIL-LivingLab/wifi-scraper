@@ -109,7 +109,10 @@ def scrape_and_insert_data():
         query = prep_query(data, 'wifi', 'wifi', tstamp)
 
         print('executing query')
-        res = make_query(query)
+        try:
+            res = make_query(query)
+        except Exception as e:
+            print e
 
     print('writing to log file')
     try:
