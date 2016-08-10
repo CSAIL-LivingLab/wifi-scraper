@@ -120,10 +120,8 @@ def scrape_and_insert_data():
     except:
         pass
 
-    # wait for 5 minutes, and then scrape data again
+
+while True:
+    scrape_and_insert_data()
     print('waiting for 5 minutes, then scraping again')
     time.sleep(5 * 60)
-    scrape_and_insert_data()
-
-
-scrape_and_insert_data()
